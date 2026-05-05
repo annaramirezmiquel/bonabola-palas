@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Configurador de Pala — Bonabola</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #000;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      padding: 2rem 1rem;
+    }
+
+    .wrap {
+      width: 100%;
+      max-width: 520px;
+    }
+
+    .logo {
+      font-size: 13px;
+      letter-spacing: .2em;
+      color: rgba(255,255,255,0.4);
+      text-transform: uppercase;
+      margin-bottom: 3rem;
+    }
+
+    .bb-prog {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 2.5rem;
+    }
+    .bb-dot {
+      height: 1.5px;
+      flex: 1;
+      background: rgba(255,255,255,0.15);
+      transition: background .4s;
+    }
+    .bb-dot.on { background: #fff; }
+
+    .bb-qlabel {
+      font-size: 11px;
+      color: rgba(255,255,255,0.35);
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      margin-bottom: .5rem;
+    }
+
+    .bb-qtitle {
+      font-size: 20px;
+      font-weight: 400;
+      color: #fff;
+      margin-bottom: 2rem;
+      line-height: 1.4;
+      letter-spacing: -.01em;
+    }
+
+    .bb-opts { display: grid; gap: 8px; }
+
+    .bb-opt {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 14px 16px;
+      border: 0.5px solid rgba(255,255,255,0.12);
+      border-radius: 3px;
+      cursor: pointer;
+      background: transparent;
+      transition: border-color .2s, background .2s;
+      width: 100%;
+      text-align: left;
+    }
+    .bb-opt:hover {
+      border-color: rgba(255,255,255,0.35);
+      background: rgba(255,255,255,0.04);
+    }
+    .bb-opt.sel {
+      border-color: #fff;
+      background: rgba(255,255,255,0.07);
+    }
+    .bb-olabel {
+      font-size: 13px;
+      font-weight: 500;
+      color: #fff;
+      letter-spacing: .01em;
+    }
+    .bb-odesc {
+      font-size: 12px;
+      color: rgba(255,255,255,0.45);
+      margin-top: 3px;
+      line-height: 1.5;
+    }
+    .bb-radio {
+      margin-left: auto;
+      flex-shrink: 0;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 0.5px solid rgba(255,255,255,0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 1px;
+    }
+    .bb-opt.sel .bb-radio { background: #fff; border-color: #fff; }
+    .bb-opt.sel .bb-radio::after {
+      content: '';
+      display: block;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #000;
+    }
+
+    .bb-nav {
+      display: flex;
+      gap: 8px;
+      margin-top: 1.75rem;
+    }
+
+    .bb-nbtn {
+      flex: 1;
+      padding: 12px;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: .02em;
+      transition: all .2s;
+      background: #fff;
+      color: #000;
+      border: 0.5px solid #fff;
+    }
+    .bb-nbtn:hover { background: rgba(255,255,255,0.88); }
+    .bb-nbtn:disabled { opacity: .2; cursor: not-allowed; }
+
+    /* Result */
+    .bb-res { animation: rIn .4s ease; }
+    @keyframes rIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .bb-res-label {
+      font-size: 11px;
+      color: rgba(255,255,255,0.3);
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      margin-bottom: 1.75rem;
+    }
+
+    .bb-pname {
+      font-size: 26px;
+      font-weight: 400;
+      color: #fff;
+      letter-spacing: -.02em;
+      margin-bottom: .5rem;
+    }
+
+    .bb-psub {
+      font-size: 11px;
+      color: rgba(255,255,255,0.3);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .bb-divider {
+      height: 0.5px;
+      background: rgba(255,255,255,0.1);
+      margin: 1.5rem 0;
+    }
+
+    .bb-specs {
+      display: flex;
+      gap: 2.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .bb-sl {
+      font-size: 10px;
+      color: rgba(255,255,255,0.3);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin-bottom: 5px;
+    }
+    .bb-sv {
+      font-size: 14px;
+      font-weight: 500;
+      color: #fff;
+    }
+
+    .bb-desc {
+      font-size: 13px;
+      color: rgba(255,255,255,0.5);
+      line-height: 1.75;
+      margin-bottom: 2rem;
+    }
+
+    .bb-cta { display: flex; gap: 8px; }
+
+    .bb-cbtn {
+      flex: 1;
+      padding: 13px;
+      border-radius: 3px;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: .02em;
+      cursor: pointer;
+      transition: all .2s;
+      background: #fff;
+      color: #000;
+      border: 0.5px solid #fff;
+    }
+    .bb-cbtn:hover { background: rgba(255,255,255,0.88); }
+
+    .bb-restart {
+      font-size: 11px;
+      color: rgba(255,255,255,0.2);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      margin-top: 1.25rem;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      display: block;
+      transition: color .2s;
+    }
+    .bb-restart:hover { color: rgba(255,255,255,0.5); }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo">Bonabola</div>
+
+  <div id="quiz">
+    <div class="bb-prog" id="prog"></div>
+    <div class="bb-qlabel" id="qlabel"></div>
+    <div class="bb-qtitle" id="qtitle"></div>
+    <div class="bb-opts" id="qopts"></div>
+    <div class="bb-nav">
+      <button class="bb-nbtn" id="btnB" onclick="back()" disabled>Atrás</button>
+      <button class="bb-nbtn" id="btnN" onclick="next()" disabled>Siguiente</button>
+    </div>
+  </div>
+
+  <div id="res" style="display:none" class="bb-res">
+    <div class="bb-res-label">Tu pala Bonabola</div>
+    <div class="bb-pname" id="r-name"></div>
+    <div class="bb-psub" id="r-sub"></div>
+    <div class="bb-divider"></div>
+    <div class="bb-specs">
+      <div><div class="bb-sl">Molde</div><div class="bb-sv" id="r-molde"></div></div>
+      <div><div class="bb-sl">Dureza</div><div class="bb-sv" id="r-dureza"></div></div>
+    </div>
+    <div class="bb-desc" id="r-desc"></div>
+    <div class="bb-cta">
+      <button class="bb-cbtn" id="r-link">Ver y configurar mi pala</button>
+      <button class="bb-cbtn" onclick="window.open('https://bonabola.com/palas','_blank')">Toda la gama</button>
+    </div>
+    <button class="bb-restart" onclick="restart()">Volver a empezar</button>
+  </div>
+</div>
+
+<script>
+const qs = [
+  {
+    label: 'Pregunta 1 de 4',
+    q: '¿Cuál es tu nivel de juego?',
+    opts: [
+      { label: 'Iniciación', desc: 'Llevo poco tiempo jugando, busco comodidad y disfrutar', val: 'inicio' },
+      { label: 'Intermedio', desc: 'Tengo soltura y quiero seguir mejorando', val: 'medio' },
+      { label: 'Avanzado / competitivo', desc: 'Juego a alto nivel, entreno con frecuencia o compito', val: 'avanzado' }
+    ]
+  },
+  {
+    label: 'Pregunta 2 de 4',
+    q: '¿Tienes molestias en el brazo o quieres protegerlo?',
+    opts: [
+      { label: 'Sí, el brazo me preocupa', desc: 'Busco la máxima comodidad y absorción de vibraciones', val: 'brazo' },
+      { label: 'No, estoy bien', desc: 'Sin molestias, busco rendimiento sin restricciones', val: 'normal' }
+    ]
+  },
+  {
+    label: 'Pregunta 3 de 4',
+    q: '¿Cómo defines tu estilo de juego?',
+    opts: [
+      { label: 'Control y construcción', desc: 'Prefiero colocar, defender y construir el punto con paciencia', val: 'control' },
+      { label: 'Ataque y remate', desc: 'Me gusta cerrar el punto con bandeja, smash y golpes fuertes', val: 'potencia' },
+      { label: 'Equilibrado', desc: 'Combino ataque y defensa según la situación', val: 'mixto' }
+    ]
+  },
+  {
+    label: 'Pregunta 4 de 4',
+    q: '¿Qué sensación buscas al golpear?',
+    opts: [
+      { label: 'Equilibrio entre confort y respuesta', desc: 'Firmeza sin sacrificar comodidad', val: 'equilibrio' },
+      { label: 'Respuesta directa y precisa', desc: 'Una pala exigente que recompense la buena técnica', val: 'directo' }
+    ]
+  }
+];
+
+const modelos = {
+  Hepta: {
+    sub: 'Hepta · Control · Estabilidad',
+    url: 'https://bonabola.com/palas/pala-hepta',
+    durezas: {
+      Soft:  'La pala más cómoda y permisiva de la gama. Punto dulce amplio, baja transmisión de vibraciones y tacto suave. Diseñada para proteger el brazo y disfrutar del juego desde el primer día.',
+      Mid:   'Mantiene el ADN de control del molde Hepta con mayor firmeza y respuesta. Equilibrio entre comodidad y rendimiento — permite acelerar la pelota sin perder estabilidad. Ideal para jugadores intermedios que quieren evolucionar.',
+      Hard:  'Para jugadores de alto nivel que buscan sensación firme y respuesta directa. El punto dulce es más concentrado y exige contacto limpio, pero ofrece mayor precisión en situaciones rápidas y exigentes.',
+      Ultra: 'La versión más exigente del molde Hepta. Alta rigidez y respuesta directa para jugadores muy técnicos con swing rápido. No es permisiva — ofrece sensaciones de nivel profesional para quienes pueden aprovecharla.'
+    }
+  },
+  Bevel: {
+    sub: 'Bevel · Potencia · Ataque',
+    url: 'https://bonabola.com/palas/pala-bevel',
+    durezas: {
+      Soft:  'Introduce el carácter ofensivo del Bevel con una sensación más suave. Amplía el punto dulce y mejora la absorción de vibraciones — para jugadores que transicionan hacia un estilo más atacante de forma progresiva.',
+      Mid:   'La opción equilibrada dentro del molde ofensivo. Potencia clara y controlada con respuesta estable. Para jugadores intermedios-avanzados que quieren atacar más sin perder seguridad.',
+      Hard:  'Para avanzados con estilo claramente ofensivo. Rigidez y balance para golpes decisivos y potentes, especialmente en volea y remate. Exigente y muy efectiva para perfiles técnicos sólidos.',
+      Ultra: 'La pala más potente y exigente de toda la gama. Máxima rigidez, mayor peso y balance ofensivo. Para jugadores expertos o competitivos que buscan el máximo rendimiento atacante sin compromisos.'
+    }
+  }
+};
+
+function recomendar(ans) {
+  const nivel  = qs[0].opts[ans[0]].val;
+  const brazo  = qs[1].opts[ans[1]].val;
+  const estilo = qs[2].opts[ans[2]].val;
+  const sens   = ans[3] !== undefined ? qs[3].opts[ans[3]].val : 'equilibrio';
+
+  if (nivel === 'inicio' || brazo === 'brazo') {
+    return { molde: estilo === 'potencia' ? 'Bevel' : 'Hepta', dureza: 'Soft' };
+  }
+
+  const molde = estilo === 'potencia' ? 'Bevel'
+              : estilo === 'control'  ? 'Hepta'
+              : nivel  === 'avanzado' ? 'Bevel' : 'Hepta';
+
+  const dureza = nivel === 'avanzado' && sens === 'directo'
+               ? (estilo !== 'control' ? 'Ultra' : 'Hard')
+               : sens === 'directo' ? 'Hard' : 'Mid';
+
+  return { molde, dureza };
+}
+
+let cur = 0, ans = [];
+
+function shouldSkip() {
+  if (ans[0] === undefined || ans[1] === undefined) return false;
+  return qs[0].opts[ans[0]].val === 'inicio' || qs[1].opts[ans[1]].val === 'brazo';
+}
+function isLast() { return cur === 3 || (cur === 2 && shouldSkip()); }
+
+function render() {
+  const q = qs[cur];
+  document.getElementById('prog').innerHTML = qs.map((_, i) =>
+    `<div class="bb-dot${i <= cur ? ' on' : ''}"></div>`).join('');
+  document.getElementById('qlabel').textContent = q.label;
+  document.getElementById('qtitle').textContent = q.q;
+  document.getElementById('qopts').innerHTML = q.opts.map((o, i) => `
+    <button class="bb-opt${ans[cur] === i ? ' sel' : ''}" onclick="sel(${i})">
+      <div style="flex:1">
+        <div class="bb-olabel">${o.label}</div>
+        <div class="bb-odesc">${o.desc}</div>
+      </div>
+      <div class="bb-radio"></div>
+    </button>`).join('');
+  document.getElementById('btnB').disabled = cur === 0;
+  document.getElementById('btnN').disabled = ans[cur] === undefined;
+  document.getElementById('btnN').textContent = isLast() ? 'Ver mi pala' : 'Siguiente';
+}
+
+function sel(i) { ans[cur] = i; render(); }
+function next() {
+  if (ans[cur] === undefined) return;
+  if (isLast()) { showRes(); return; }
+  cur++;
+  render();
+}
+function back() { if (cur > 0) { cur--; render(); } }
+
+function showRes() {
+  const { molde, dureza } = recomendar(ans);
+  const m = modelos[molde];
+  document.getElementById('quiz').style.display = 'none';
+  document.getElementById('res').style.display  = 'block';
+  document.getElementById('r-name').textContent  = `Bonabola ${molde} ${dureza}`;
+  document.getElementById('r-sub').textContent   = m.sub;
+  document.getElementById('r-molde').textContent = molde;
+  document.getElementById('r-dureza').textContent = dureza;
+  document.getElementById('r-desc').textContent  = m.durezas[dureza];
+  document.getElementById('r-link').onclick = () => window.open(m.url, '_blank');
+}
+
+function restart() {
+  cur = 0; ans = [];
+  document.getElementById('quiz').style.display = 'block';
+  document.getElementById('res').style.display  = 'none';
+  render();
+}
+
+render();
+</script>
+</body>
+</html>
